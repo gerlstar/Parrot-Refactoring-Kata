@@ -8,15 +8,25 @@ use Exception;
 
 class Parrot
 {
+ 
+    private ParrotInterface $parrot;
+
+    // if we add a new Parrot type like TropicalParrot, we can add it in the
+    // factory and call the factory inside this constructor so that we dont over
+    //populate the constructor
+    // eg: $this->parrot = ParrotFactory::create($type, $numberOfCoconuts, $voltage, $isNailed);
     public function __construct(
-        /**
-         * @var int ParrotTypeEnum
-         */
         private int $type,
         private int $numberOfCoconuts,
         private float $voltage,
         private bool $isNailed
     ) {
+       $this->parrot = match ($type) {
+            ParrotTypeEnum::EUROPEAN => new EuropeanParrot(),
+            ParrotTypeEnum::AFRICAN => new AfricanParrot($numberOfCoconuts),
+            ParrotTypeEnum::NORWEGIAN_BLUE => new NorwegianBlueParrot($voltage, $isNailed),
+            default => throw new Exception('Should be unreachable'),
+        };
     }
 
     /**
@@ -24,12 +34,7 @@ class Parrot
      */
     public function getSpeed(): float
     {
-        return match ($this->type) {
-            ParrotTypeEnum::EUROPEAN => $this->getBaseSpeed(),
-            ParrotTypeEnum::AFRICAN => max(0, $this->getBaseSpeed() - $this->getLoadFactor() * $this->numberOfCoconuts),
-            ParrotTypeEnum::NORWEGIAN_BLUE => $this->isNailed ? 0 : $this->getBaseSpeedWith($this->voltage),
-            default => throw new Exception('Should be unreachable'),
-        };
+        return $this->parrot->getSpeed();
     }
 
     /**
@@ -37,26 +42,9 @@ class Parrot
      */
     public function getCry(): string
     {
-        return match ($this->type) {
-            ParrotTypeEnum::EUROPEAN => 'Sqoork!',
-            ParrotTypeEnum::AFRICAN => 'Sqaark!',
-            ParrotTypeEnum::NORWEGIAN_BLUE => $this->voltage > 0 ? 'Bzzzzzz' : '...',
-            default => throw new Exception('Should be unreachable'),
-        };
+        return $this->parrot->getCry();
+
     }
 
-    private function getBaseSpeedWith(float $voltage): float
-    {
-        return min(24.0, $voltage * $this->getBaseSpeed());
-    }
-
-    private function getLoadFactor(): float
-    {
-        return 9.0;
-    }
-
-    private function getBaseSpeed(): float
-    {
-        return 12.0;
-    }
+  
 }

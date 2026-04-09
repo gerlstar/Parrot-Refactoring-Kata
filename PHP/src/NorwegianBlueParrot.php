@@ -3,25 +3,33 @@
 declare(strict_types=1);
 
 namespace Parrot;
-
-use Exception;
 // use ParrotInterface;
+use Exception;
 
-class EuropeanParrot extends Parrot implements ParrotInterface
+class NorwegianBlueParrot extends Parrot  implements ParrotInterface
 {
     private const BASESPEED = 12.0;
     private const LOADFACTOR = 9.0;
     private const GAGE = 24.0;
-    private string $cry = 'Sqoork!';
+    private string $cry = '...';
+    private string $cryWithVoltage = 'Bzzzzzz';
 
-    public function __construct() {}
+    public function __construct(
+
+        private float $voltage,
+        private bool $isNailed
+    ) {}
 
     /**
      * @throws Exception
      */
     public function getSpeed(): float
     {
-        return $this->getBaseSpeed();
+
+        if (!$this->isNailed) {
+            return self::getBaseSpeedWith($this->voltage);
+        }
+        return 0;
     }
 
     /**
@@ -29,7 +37,7 @@ class EuropeanParrot extends Parrot implements ParrotInterface
      */
     public function getCry(): string
     {
-        return $this->cry;
+        return $this->voltage > 0 ? $this->cryWithVoltage : $this->cry;
     }
 
     public function getBaseSpeedWith(float $voltage): float
@@ -37,6 +45,10 @@ class EuropeanParrot extends Parrot implements ParrotInterface
         return min(self::GAGE, $voltage * $this->getBaseSpeed());
     }
 
+    public function getLoadFactor(): float
+    {
+        return self::LOADFACTOR;
+    }
 
     public function getBaseSpeed(): float
     {
