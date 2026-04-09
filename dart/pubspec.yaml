@@ -1,9 +1,0 @@
-name: parrot_refactoring_kata
-description: Parrot refactoring kata.
-version: 1.0.0
-
-environment:
-  sdk: ^3.6.1
-
-dev_dependencies:
-  test: ^1.24.0
